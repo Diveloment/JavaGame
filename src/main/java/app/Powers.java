@@ -10,10 +10,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import ecs.components.*;
 import ecs.components.collision.CollisionComponent;
 import ecs.systems.*;
 import managers.CollisionComputer;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Powers extends ApplicationAdapter {
 
@@ -43,12 +47,13 @@ public class Powers extends ApplicationAdapter {
         engine.addSystem(new BulletSystem(engine));
         engine.addSystem(new SpriteRenderSystem(batch));
 
+
         Entity cube = new Entity();
         cube.add(new PositionComponent(100, 0));
         cube.add(new VelocityComponent(0, 0));
-        cube.add(new CollisionComponent());
+        cube.add(new CollisionComponent(16));
         cube.add(new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png"))));
-        cube.add(new TeamComponent("Players"));
+        cube.add(new TeamComponent("Neutrals"));
         engine.addEntity(cube);
 
         Entity playerEntity = new Entity();
@@ -85,6 +90,8 @@ public class Powers extends ApplicationAdapter {
 
         playerEntity.add(hardpointsComponent);
         engine.addEntity(playerEntity);
+
+        createWall(new Vector2(200, 100), 100, 1, "Neutrals");
     }
 
     @Override
@@ -111,5 +118,40 @@ public class Powers extends ApplicationAdapter {
         shapeRenderer.dispose();
         batch.dispose();
         font.dispose();
+    }
+
+    public void createWall(Vector2 position, int width, int height, String team) {
+        // Создаем пул потоков для выполнения задач
+        int numThreads = Runtime.getRuntime().availableProcessors(); // Определение количества доступных процессоров
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                final int x = i;
+                final int y = j;
+
+                // Передаем задачу в пул потоков
+                executor.submit(() -> Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        createCube(position, x, y, team);
+                    }
+                }));
+            }
+        }
+
+        // Завершаем работу пула потоков после выполнения всех задач
+        executor.shutdown();
+    }
+
+    private void createCube(Vector2 position, int x, int y, String team) {
+        Entity cube = new Entity();
+        SpriteComponent sprite = new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png")));
+        cube.add(new PositionComponent(position.x + (x * sprite.sprite.getWidth()), position.y + (y * sprite.sprite.getHeight())));
+        cube.add(new VelocityComponent(0, 0));
+        cube.add(sprite);
+        cube.add(new CollisionComponent(8));
+        cube.add(new TeamComponent(team));
+        engine.addEntity(cube);
     }
 }

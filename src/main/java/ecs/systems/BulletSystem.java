@@ -6,7 +6,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import data.CollidersResponse;
 import ecs.components.BulletComponent;
 import ecs.components.PositionComponent;
@@ -15,6 +14,7 @@ import ecs.components.TeamComponent;
 import managers.CollisionComputer;
 
 import java.util.Objects;
+import java.util.Set;
 
 public class BulletSystem extends IteratingSystem {
     private ComponentMapper<BulletComponent> bulletMapper;
@@ -38,6 +38,9 @@ public class BulletSystem extends IteratingSystem {
         SpriteComponent spriteComponent = spriteMapper.get(entity);
         PositionComponent positionComponent = positionMapper.get(entity);
 
+        bullet.lastPosition.x = positionComponent.x;
+        bullet.lastPosition.y = positionComponent.y;
+
         positionComponent.x += bullet.velocity.x * deltaTime;
         positionComponent.y += bullet.velocity.y * deltaTime;
         float directionAngle = MathUtils.atan2(bullet.velocity.y, bullet.velocity.x) * MathUtils.radiansToDegrees;
@@ -53,7 +56,7 @@ public class BulletSystem extends IteratingSystem {
         // Collisions
         CollidersResponse response = collisionComputer.onCollide(entity);
         if (response.isColliding) {
-            Array<Entity> colliders = response.collidersEntities;
+            Set<Entity> colliders = response.collidersEntities;
 
             // Проверяем, были ли столкновения с другими объектами
             boolean collidedWithNonProjectile = false;

@@ -1,17 +1,18 @@
 package data;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.utils.Array;
+
+import java.util.Set;
 
 public class CollidersResponse {
-    public Array<Entity> collidersEntities;
+    public Set<Entity> collidersEntities;
     public boolean isColliding;
     public int collisionsCount;
 
     public CollidersResponse() {
     }
 
-    public CollidersResponse(Array<Entity> collidersEntities, boolean isColliding, int collisionsCount) {
+    public CollidersResponse(Set<Entity> collidersEntities, boolean isColliding, int collisionsCount) {
         this.collidersEntities = collidersEntities;
         this.isColliding = isColliding;
         this.collisionsCount = collisionsCount;

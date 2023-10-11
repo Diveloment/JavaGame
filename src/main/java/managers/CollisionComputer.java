@@ -5,18 +5,18 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import data.CollidersResponse;
+import ecs.components.BulletComponent;
 import ecs.components.PositionComponent;
+import ecs.components.VelocityComponent;
 import ecs.components.collision.CollisionComponent;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CollisionComputer extends GameManager {
 
     private static CollisionComputer instance;
-    private Map<Entity, Array<Entity>> collidedEntities = new HashMap<Entity, Array<Entity>>();
+    private Map<Entity, Set<Entity>> collidedEntities = new HashMap<Entity, Set<Entity>>();
 
     private CollisionComputer(Engine engine) {
         this.engine = engine;
@@ -44,6 +44,8 @@ public class CollisionComputer extends GameManager {
         for (Entity entityA : entities) {
             CollisionComponent collisionComponentA = entityA.getComponent(CollisionComponent.class);
             PositionComponent positionComponentA = entityA.getComponent(PositionComponent.class);
+            BulletComponent bulletComponent = entityA.getComponent(BulletComponent.class);
+            VelocityComponent velocityComponent = entityA.getComponent(VelocityComponent.class);
 
             for (int i = 0; i < entities.size(); i++) {
                 Entity entityB = entities.get(i);
@@ -51,11 +53,19 @@ public class CollisionComputer extends GameManager {
                     CollisionComponent collisionComponentB = entityB.getComponent(CollisionComponent.class);
                     PositionComponent positionComponentB = entityB.getComponent(PositionComponent.class);
 
-                    // Здесь реализуйте вашу логику определения столкновения между entityA и entityB
-                    if (checkCollision(collisionComponentA, positionComponentA, collisionComponentB, positionComponentB)) {
-                        // Если есть столкновение, добавьте entityB в список столкнувшихся сущностей entityA
-                        collidedEntities.computeIfAbsent(entityA, k -> new Array<>()).removeValue(entityB, true);
-                        collidedEntities.computeIfAbsent(entityA, k -> new Array<>()).add(entityB);
+                    boolean isCollide;
+                    if (Objects.nonNull(bulletComponent))
+                        isCollide = isLineIntersectingCircle(new Vector2(bulletComponent.lastPosition.x, bulletComponent.lastPosition.y),
+                                new Vector2(positionComponentA.x, positionComponentA.y),
+                                new Vector2(positionComponentB.x, positionComponentB.y),
+                                collisionComponentB.radius);
+                    else
+                        isCollide = checkCollision(collisionComponentA, positionComponentA, collisionComponentB, positionComponentB);
+
+                    if (isCollide) {
+                        collidedEntities.computeIfAbsent(entityA, k -> new HashSet<>()).add(entityB);
+                        if (Objects.nonNull(bulletComponent))
+                            break;
                     }
                 }
             }
@@ -76,12 +86,29 @@ public class CollisionComputer extends GameManager {
         return distance <= (radiusA + radiusB);
     }
 
+    public boolean isLineIntersectingCircle(Vector2 A, Vector2 B, Vector2 C, float R) {
+        Vector2 AB = B.cpy().sub(A);
+        Vector2 AC = C.cpy().sub(A);
+
+        float dotProduct = AC.dot(AB);
+
+        // Найдите ближайшую точку P на прямой к центру круга
+        Vector2 P = A.cpy().add(AB.cpy().scl(dotProduct / AB.len2()));
+
+        // Проверьте, находится ли P внутри круга
+        return C.cpy().dst(P) <= R && P.cpy().dst(A.cpy().lerp(B.cpy(), 0.5f)) <= (AB.len() / 2 + R);
+    }
+
     public CollidersResponse onCollide(Entity entity) {
         CollidersResponse response = new CollidersResponse();
-        Array<Entity> entities = collidedEntities.getOrDefault(entity, new Array<>());
-        response.collisionsCount = entities.size;
-        response.isColliding = entities.size > 0;
+        Set<Entity> entities = collidedEntities.getOrDefault(entity, new HashSet<>());
+        response.collisionsCount = entities.size();
+        response.isColliding = entities.size() > 0;
         response.collidersEntities = entities;
         return response;
+    }
+
+    public ImmutableArray<Entity> getAllColliders() {
+        return engine.getEntitiesFor(Family.all(CollisionComponent.class, PositionComponent.class).get());
     }
 }
