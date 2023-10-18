@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import ecs.components.*;
 import ecs.components.collision.CollisionComponent;
+import ecs.components.physics.PhysicsComponent;
 import ecs.systems.*;
 import managers.CollisionComputer;
 import models.PhysicsWorldModel;
@@ -23,6 +24,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Powers extends ApplicationAdapter {
+
+    public static final float DEFAULT_SCALING = 16.0f;
 
     OrthographicCamera camera;
     OrthographicCamera textCamera;
@@ -43,12 +46,14 @@ public class Powers extends ApplicationAdapter {
         font = new BitmapFont();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        //camera.zoom = 1f;
         debugRenderer = new Box2DDebugRenderer(true,true,true,true,true,true);
         textCamera = new OrthographicCamera();
         textCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         collisionComputer = CollisionComputer.getInstance(engine);
 
         engine.addSystem(new PlayerControlSystem());
+        engine.addSystem(new MovementSystem());
         engine.addSystem(new HardpointsSystem());
         engine.addSystem(new WeaponSystem(engine));
         engine.addSystem(new BulletSystem(engine));
@@ -64,7 +69,9 @@ public class Powers extends ApplicationAdapter {
 
         Entity playerEntity = new Entity();
         PlayerComponent playerComponent = new PlayerComponent(camera);
-        playerComponent.maxSpeed = 100;
+        playerComponent.maxSpeed = 200;
+        PhysicsComponent physicsComponent = new PhysicsComponent(physics);
+        playerEntity.add(physicsComponent);
         playerEntity.add(playerComponent);
         playerEntity.add(new PositionComponent(0, 0));
         playerEntity.add(new RotationComponent(0));
@@ -97,21 +104,18 @@ public class Powers extends ApplicationAdapter {
         playerEntity.add(hardpointsComponent);
         engine.addEntity(playerEntity);
 
-        createWall(new Vector2(200, 100), 100, 1, "Players");
-
-        physics.createObject(new Vector2(0, 0), new Vector2(1f, 0f));
-        physics.
+        createWall(new Vector2(200, 100), 100, 10, "Neutrals", true);
     }
 
     @Override
     public void render () {
         float deltaTime = Gdx.graphics.getDeltaTime();
-        physics.update(deltaTime);
+        physics.update(1/60f);
         // Очистка экрана
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        debugRenderer.render(physics.world, camera.combined.scl(16));
+        debugRenderer.render(physics.world, camera.combined.scl(DEFAULT_SCALING));
 
         // Обновление игры
         collisionComputer.update();
@@ -132,7 +136,7 @@ public class Powers extends ApplicationAdapter {
         font.dispose();
     }
 
-    public void createWall(Vector2 position, int width, int height, String team) {
+    public void createWall(Vector2 position, int width, int height, String team, boolean isPhysics) {
         // Создаем пул потоков для выполнения задач
         int numThreads = Runtime.getRuntime().availableProcessors(); // Определение количества доступных процессоров
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
@@ -146,7 +150,7 @@ public class Powers extends ApplicationAdapter {
                 executor.submit(() -> Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        createCube(position, x, y, team);
+                        createCube(position, x, y, team, isPhysics);
                     }
                 }));
             }
@@ -156,14 +160,19 @@ public class Powers extends ApplicationAdapter {
         executor.shutdown();
     }
 
-    private void createCube(Vector2 position, int x, int y, String team) {
+    private void createCube(Vector2 position, int x, int y, String team, boolean isPhysics) {
         Entity cube = new Entity();
         SpriteComponent sprite = new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png")));
         cube.add(new PositionComponent(position.x + (x * sprite.sprite.getWidth()), position.y + (y * sprite.sprite.getHeight())));
         cube.add(new VelocityComponent(0, 0));
         cube.add(sprite);
-        cube.add(new CollisionComponent(8));
+        cube.add(new CollisionComponent(16));
         cube.add(new TeamComponent(team));
+        if (isPhysics) {
+            PhysicsComponent physicsComponent = PhysicsComponent.buildKinematicBody(physics, 8.0f);
+            physicsComponent.body.setTransform(cube.getComponent(PositionComponent.class).getPosition().scl(1/DEFAULT_SCALING), 0);
+            cube.add(physicsComponent);
+        }
         engine.addEntity(cube);
     }
 }

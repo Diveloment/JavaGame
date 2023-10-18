@@ -10,6 +10,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import ecs.components.*;
+import ecs.components.physics.PhysicsComponent;
+
+import static app.Powers.DEFAULT_SCALING;
 
 public class PlayerControlSystem extends IteratingSystem {
     private ComponentMapper<PositionComponent> positionMapper;
@@ -18,15 +21,17 @@ public class PlayerControlSystem extends IteratingSystem {
     private ComponentMapper<SpriteComponent> spriteMapper;
     private ComponentMapper<HardpointsComponent> hardpointsMapper;
     private ComponentMapper<RotationComponent> rotationMapper;
+    private ComponentMapper<PhysicsComponent> physicsMapper;
 
     public PlayerControlSystem() {
-        super(Family.all(PlayerComponent.class, PositionComponent.class, VelocityComponent.class, SpriteComponent.class, RotationComponent.class).get());
+        super(Family.all(PlayerComponent.class, PositionComponent.class, VelocityComponent.class, SpriteComponent.class, RotationComponent.class, PhysicsComponent.class).get());
         positionMapper = ComponentMapper.getFor(PositionComponent.class);
         rotationMapper = ComponentMapper.getFor(RotationComponent.class);
         velocityMapper = ComponentMapper.getFor(VelocityComponent.class);
         playerMapper = ComponentMapper.getFor(PlayerComponent.class);
         spriteMapper = ComponentMapper.getFor(SpriteComponent.class);
         hardpointsMapper = ComponentMapper.getFor(HardpointsComponent.class);
+        physicsMapper = ComponentMapper.getFor(PhysicsComponent.class);
     }
 
     @Override
@@ -37,6 +42,7 @@ public class PlayerControlSystem extends IteratingSystem {
         PlayerComponent playerComponent = playerMapper.get(entity);
         SpriteComponent spriteComponent = spriteMapper.get(entity);
         HardpointsComponent hardpointsComponent = hardpointsMapper.get(entity);
+        PhysicsComponent physicsComponent = physicsMapper.get(entity);
 
         float mouseX = Gdx.input.getX();
         float mouseY = Gdx.input.getY();
@@ -73,8 +79,8 @@ public class PlayerControlSystem extends IteratingSystem {
 
         playerComponent.camera.position.set(playerSprite.getX() + playerSprite.getWidth() / 2, playerSprite.getY() + playerSprite.getHeight() / 2, 0);
 
-        position.x += velocity.x * playerComponent.maxSpeed * deltaTime;
-        position.y += velocity.y * playerComponent.maxSpeed * deltaTime;
+        velocity.x *= playerComponent.maxSpeed;
+        velocity.y *= playerComponent.maxSpeed;
 
         for (Entity weapon : hardpointsComponent.weapons) {
             weapon.getComponent(AimPointComponent.class).setAimPoint(mouseWorldX, mouseWorldY);

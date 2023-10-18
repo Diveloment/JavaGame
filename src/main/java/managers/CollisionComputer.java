@@ -38,17 +38,17 @@ public class CollisionComputer extends GameManager {
 
     @Override
     public void update() {
-        ImmutableArray<Entity> entities = engine.getEntitiesFor(Family.all(CollisionComponent.class, PositionComponent.class).get());
+        ImmutableArray<Entity> entities = engine.getEntitiesFor(Family.all(CollisionComponent.class, PositionComponent.class, BulletComponent.class).get());
+        ImmutableArray<Entity> entitiesB = engine.getEntitiesFor(Family.all(CollisionComponent.class, PositionComponent.class).get());
         collidedEntities.clear();
 
         for (Entity entityA : entities) {
             CollisionComponent collisionComponentA = entityA.getComponent(CollisionComponent.class);
             PositionComponent positionComponentA = entityA.getComponent(PositionComponent.class);
             BulletComponent bulletComponent = entityA.getComponent(BulletComponent.class);
-            VelocityComponent velocityComponent = entityA.getComponent(VelocityComponent.class);
 
-            for (int i = 0; i < entities.size(); i++) {
-                Entity entityB = entities.get(i);
+            for (int i = 0; i < entitiesB.size(); i++) {
+                Entity entityB = entitiesB.get(i);
                 if (entityA != entityB) {
                     CollisionComponent collisionComponentB = entityB.getComponent(CollisionComponent.class);
                     PositionComponent positionComponentB = entityB.getComponent(PositionComponent.class);

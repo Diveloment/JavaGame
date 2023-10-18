@@ -11,7 +11,7 @@ public class Application {
         config.useVsync(false);
         config.setForegroundFPS(60);
         //config.setMaximized(true);
-        //config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+        config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
         new Lwjgl3Application(new Powers(), config);
     }
 }

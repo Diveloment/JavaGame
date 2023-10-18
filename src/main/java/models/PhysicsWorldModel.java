@@ -12,7 +12,7 @@ public class PhysicsWorldModel {
     }
 
     public void update(float delta){
-        world.step(delta , 6, 2);
+        world.step(delta , 3, 3);
     }
 
     public void createObject(Vector2 position, Vector2 velocity){
@@ -21,8 +21,6 @@ public class PhysicsWorldModel {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(position.x, position.y);
-        bodyDef.active = true;
-        bodyDef.bullet = true;
 
 
         // add it to the world
@@ -48,7 +46,7 @@ public class PhysicsWorldModel {
         bodyd.setLinearVelocity(velocity);
     }
 
-    private void createFloor(Vector2 position, Vector2 size) {
+    public void createFloor(Vector2 position, Vector2 size) {
 
         // create a new body definition (type and location)
         BodyDef bodyDef = new BodyDef();
