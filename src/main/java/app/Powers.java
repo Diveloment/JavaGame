@@ -11,10 +11,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import ecs.components.*;
 import ecs.components.collision.CollisionComponent;
 import ecs.systems.*;
 import managers.CollisionComputer;
+import models.PhysicsWorldModel;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,15 +31,19 @@ public class Powers extends ApplicationAdapter {
     BitmapFont font;
     Engine engine;
     CollisionComputer collisionComputer;
+    PhysicsWorldModel physics;
+    Box2DDebugRenderer debugRenderer;
 
     @Override
     public void create () {
+        physics = new PhysicsWorldModel();
         engine = new Engine();
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        debugRenderer = new Box2DDebugRenderer(true,true,true,true,true,true);
         textCamera = new OrthographicCamera();
         textCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         collisionComputer = CollisionComputer.getInstance(engine);
@@ -47,10 +54,9 @@ public class Powers extends ApplicationAdapter {
         engine.addSystem(new BulletSystem(engine));
         engine.addSystem(new SpriteRenderSystem(batch));
 
-
         Entity cube = new Entity();
         cube.add(new PositionComponent(100, 0));
-        cube.add(new VelocityComponent(0, 0));
+        cube.add(new VelocityComponent(0, 5));
         cube.add(new CollisionComponent(16));
         cube.add(new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png"))));
         cube.add(new TeamComponent("Neutrals"));
@@ -91,17 +97,23 @@ public class Powers extends ApplicationAdapter {
         playerEntity.add(hardpointsComponent);
         engine.addEntity(playerEntity);
 
-        createWall(new Vector2(200, 100), 100, 1, "Neutrals");
+        createWall(new Vector2(200, 100), 100, 1, "Players");
+
+        physics.createObject(new Vector2(0, 0), new Vector2(1f, 0f));
+        physics.
     }
 
     @Override
     public void render () {
+        float deltaTime = Gdx.graphics.getDeltaTime();
+        physics.update(deltaTime);
         // Очистка экрана
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        debugRenderer.render(physics.world, camera.combined.scl(16));
+
         // Обновление игры
-        float deltaTime = Gdx.graphics.getDeltaTime();
         collisionComputer.update();
         camera.update();
 
