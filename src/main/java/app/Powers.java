@@ -61,7 +61,8 @@ public class Powers extends ApplicationAdapter {
 
         Entity cube = new Entity();
         cube.add(new PositionComponent(100, 0));
-        cube.add(new VelocityComponent(0, 5));
+        cube.add(new VelocityComponent(0, 10));
+        cube.add(new PhysicsComponent(physics, 8));
         cube.add(new CollisionComponent(16));
         cube.add(new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png"))));
         cube.add(new TeamComponent("Neutrals"));

@@ -1,6 +1,7 @@
 package ecs.components.physics;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -11,6 +12,7 @@ import static app.Powers.DEFAULT_SCALING;
 
 public class PhysicsComponent implements Component {
     public Body body;
+    public boolean initialized = false;
 
     public PhysicsComponent(Body body) {
         this.body = body;

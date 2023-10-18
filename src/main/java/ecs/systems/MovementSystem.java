@@ -29,6 +29,10 @@ public class MovementSystem extends IteratingSystem {
         VelocityComponent velocityComponent = velocityMapper.get(entity);
 
         if (Objects.nonNull(physicsComponent)) {
+            if (!physicsComponent.initialized) {
+                physicsComponent.body.setTransform(positionComponent.getPosition().scl(1/DEFAULT_SCALING), 0.0f);
+                physicsComponent.initialized = true;
+            }
             physicsComponent.body.setLinearVelocity(velocityComponent.x * deltaTime,
                     velocityComponent.y * deltaTime);
             positionComponent.setPosition(physicsComponent.body.getPosition().scl(DEFAULT_SCALING));
