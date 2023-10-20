@@ -1,13 +1,23 @@
 package models;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import managers.CollisionComputer;
 
 public class PhysicsWorldModel {
 
+    public static PhysicsWorldModel instance;
     public World world;
 
-    public PhysicsWorldModel() {
+    public static PhysicsWorldModel getInstance() {
+        if (instance == null) {
+            instance = new PhysicsWorldModel();
+        }
+        return instance;
+    }
+
+    private PhysicsWorldModel() {
         world = new World(new Vector2(0, 0), true);
     }
 

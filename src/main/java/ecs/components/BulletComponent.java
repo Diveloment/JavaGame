@@ -9,6 +9,6 @@ public class BulletComponent implements Component {
     public Vector2 lastPosition = new Vector2();
     public Entity owner;
     public float scale = 0.75f;
-    public float ttl = 5;
+    public float ttl = 5.0f;
 }
 

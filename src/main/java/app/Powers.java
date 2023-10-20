@@ -8,16 +8,17 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
 import ecs.components.*;
 import ecs.components.collision.CollisionComponent;
 import ecs.components.physics.PhysicsComponent;
 import ecs.systems.*;
 import managers.CollisionComputer;
+import managers.ResourceManager;
 import models.PhysicsWorldModel;
 
 import java.util.concurrent.ExecutorService;
@@ -36,27 +37,30 @@ public class Powers extends ApplicationAdapter {
     CollisionComputer collisionComputer;
     PhysicsWorldModel physics;
     Box2DDebugRenderer debugRenderer;
+    ResourceManager resourceManager;
 
     @Override
     public void create () {
-        physics = new PhysicsWorldModel();
+        physics = PhysicsWorldModel.getInstance();
         engine = new Engine();
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        //camera.zoom = 1f;
         debugRenderer = new Box2DDebugRenderer(true,true,true,true,true,true);
         textCamera = new OrthographicCamera();
         textCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         collisionComputer = CollisionComputer.getInstance(engine);
+        resourceManager = new ResourceManager();
 
         engine.addSystem(new PlayerControlSystem());
         engine.addSystem(new MovementSystem());
         engine.addSystem(new HardpointsSystem());
         engine.addSystem(new WeaponSystem(engine));
         engine.addSystem(new BulletSystem(engine));
+        engine.addSystem(new HealthSystem(engine));
+        engine.addSystem(new StatusSystem());
         engine.addSystem(new SpriteRenderSystem(batch));
 
         Entity cube = new Entity();
@@ -64,7 +68,8 @@ public class Powers extends ApplicationAdapter {
         cube.add(new VelocityComponent(0, 10));
         cube.add(new PhysicsComponent(physics, 8));
         cube.add(new CollisionComponent(16));
-        cube.add(new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png"))));
+        cube.add(new HealthComponent(100.0f));
+        cube.add(new SpriteComponent((Sprite) resourceManager.getResource("assets/cube.png", Sprite.class)));
         cube.add(new TeamComponent("Neutrals"));
         engine.addEntity(cube);
 
@@ -78,7 +83,7 @@ public class Powers extends ApplicationAdapter {
         playerEntity.add(new RotationComponent(0));
         playerEntity.add(new VelocityComponent(0, 0));
         playerEntity.add(new CollisionComponent());
-        playerEntity.add(new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png"))));
+        playerEntity.add(new SpriteComponent((Sprite) resourceManager.getResource("assets/cube.png", Sprite.class)));
         playerEntity.add(new TeamComponent("Players"));
 
         Entity playerWeapon = new Entity();
@@ -88,14 +93,14 @@ public class Powers extends ApplicationAdapter {
         playerWeapon.add(new PositionComponent(0, 0));
         playerWeapon.add(new RotationComponent(0));
         playerWeapon.add(new AimPointComponent(0, 0));
-        playerWeapon.add(new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png"))));
+        playerWeapon.add(new SpriteComponent((Sprite) resourceManager.getResource("assets/cube.png", Sprite.class)));
         engine.addEntity(playerWeapon);
         Entity playerWeapon2 = new Entity();
         playerWeapon2.add(new WeaponComponent(25, -25));
         playerWeapon2.add(new PositionComponent(0, 0));
         playerWeapon2.add(new RotationComponent(0));
         playerWeapon2.add(new AimPointComponent(0, 0));
-        playerWeapon2.add(new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png"))));
+        playerWeapon2.add(new SpriteComponent((Sprite) resourceManager.getResource("assets/cube.png", Sprite.class)));
         engine.addEntity(playerWeapon2);
 
         HardpointsComponent hardpointsComponent = new HardpointsComponent();
@@ -105,7 +110,7 @@ public class Powers extends ApplicationAdapter {
         playerEntity.add(hardpointsComponent);
         engine.addEntity(playerEntity);
 
-        createWall(new Vector2(200, 100), 100, 10, "Neutrals", true);
+        createWall(new Vector2(200, 100), 100, 1, "Neutrals", true);
     }
 
     @Override
@@ -146,8 +151,6 @@ public class Powers extends ApplicationAdapter {
             for (int j = 0; j < height; j++) {
                 final int x = i;
                 final int y = j;
-
-                // Передаем задачу в пул потоков
                 executor.submit(() -> Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
@@ -156,18 +159,17 @@ public class Powers extends ApplicationAdapter {
                 }));
             }
         }
-
-        // Завершаем работу пула потоков после выполнения всех задач
         executor.shutdown();
     }
 
     private void createCube(Vector2 position, int x, int y, String team, boolean isPhysics) {
         Entity cube = new Entity();
-        SpriteComponent sprite = new SpriteComponent(new Texture(Gdx.files.internal("assets/cube.png")));
+        SpriteComponent sprite = new SpriteComponent((Sprite) resourceManager.getResource("assets/cube.png", Sprite.class));
         cube.add(new PositionComponent(position.x + (x * sprite.sprite.getWidth()), position.y + (y * sprite.sprite.getHeight())));
         cube.add(new VelocityComponent(0, 0));
         cube.add(sprite);
-        cube.add(new CollisionComponent(16));
+        cube.add(new CollisionComponent(8));
+        cube.add(new HealthComponent(30.f));
         cube.add(new TeamComponent(team));
         if (isPhysics) {
             PhysicsComponent physicsComponent = PhysicsComponent.buildKinematicBody(physics, 8.0f);

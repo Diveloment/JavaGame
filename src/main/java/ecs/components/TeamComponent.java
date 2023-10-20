@@ -11,9 +11,6 @@ public class TeamComponent implements Component {
 
     public String teamName;
 
-    public Set<String> alliedTeams = new HashSet<>();
-    public Set<String> enemyTeams = new HashSet<>();
-
     public TeamComponent(String teamName) {
         teams.add(teamName);
         this.teamName = teamName;

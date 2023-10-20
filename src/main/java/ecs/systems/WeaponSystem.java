@@ -60,6 +60,7 @@ public class WeaponSystem extends IteratingSystem {
         Entity bulletEntity = new Entity();
         BulletComponent bulletComponent = new BulletComponent();
         PositionComponent positionComponent = new PositionComponent(position.x, position.y);
+        DamageComponent damageComponent = new DamageComponent(10.0f);
         CollisionComponent collisionComponent = new CollisionComponent(8);
         SpriteComponent spriteComponent = new SpriteComponent(new Texture(Gdx.files.internal("assets/bullet_small_v2.png")));
 
@@ -78,6 +79,7 @@ public class WeaponSystem extends IteratingSystem {
         bulletEntity.add(spriteComponent);
         bulletEntity.add(positionComponent);
         bulletEntity.add(collisionComponent);
+        bulletEntity.add(damageComponent);
 
         engine.addEntity(bulletEntity);
     }
