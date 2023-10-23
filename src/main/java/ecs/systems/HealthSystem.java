@@ -57,7 +57,6 @@ public class HealthSystem extends IteratingSystem {
         if (statusComponent != null) {
             if (statusComponent.getEffects().stream().anyMatch(effect -> effect.type == StatusEffect.StatusType.WET)
             && healthComponent.takenDamageType == DamageModifiers.ELECTRICAL) {
-                statusDamageModifiers.add()
             }
         }
         healthComponent.health -= healthComponent.damageTaken * healthComponent.takenDamageType.getDamageMod();

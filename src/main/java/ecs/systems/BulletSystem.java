@@ -7,8 +7,11 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import data.CollidersResponse;
+import data.VFXEffectPresets;
 import ecs.components.*;
 import managers.CollisionComputer;
+import managers.VFXManager;
+import managers.VFXManager.Asset;
 
 import java.util.Objects;
 import java.util.Set;
@@ -19,6 +22,7 @@ public class BulletSystem extends IteratingSystem {
     private final ComponentMapper<PositionComponent> positionMapper;
     private final Engine engine;
     private final CollisionComputer collisionComputer;
+    private final VFXManager vfxManager;
 
     public BulletSystem(Engine engine) {
         super(Family.all(BulletComponent.class, PositionComponent.class, SpriteComponent.class).get());
@@ -27,6 +31,7 @@ public class BulletSystem extends IteratingSystem {
         positionMapper = ComponentMapper.getFor(PositionComponent.class);
         this.engine = engine;
         this.collisionComputer = CollisionComputer.getInstance();
+        this.vfxManager = VFXManager.getInstance();
     }
 
     @Override
@@ -63,7 +68,7 @@ public class BulletSystem extends IteratingSystem {
                 if (Objects.nonNull(colliderTeamComponent))
                     colliderTeam = colliderTeamComponent.teamName;
                 if (!isProjectile(collider) && !Objects.equals(collider, bullet.owner) && !bulletTeam.equals(colliderTeam)) {
-                    applyHit(collider, entity, damageComponent);
+                    applyHit(collider, entity, damageComponent, positionComponent, bullet, directionAngle);
                     return;
                 }
             }
@@ -75,9 +80,12 @@ public class BulletSystem extends IteratingSystem {
         }
     }
 
-    private void applyHit(Entity collider, Entity bulletEntity, DamageComponent damageComponent) {
+    private void applyHit(Entity collider, Entity bulletEntity, DamageComponent damageComponent,
+                          PositionComponent positionComponent, BulletComponent bulletComponent, float angleHit) {
         if (Objects.nonNull(damageComponent))
             dealDamage(damageComponent, collider);
+        Asset asset = vfxManager.makeAnimationAsset(VFXEffectPresets.BULLET_HIT_SMALL);
+        vfxManager.spawnEffect(asset, bulletComponent.lastPosition, 0.25f, angleHit);
         engine.removeEntity(bulletEntity);
     }
 

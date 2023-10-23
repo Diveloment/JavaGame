@@ -2,10 +2,7 @@ package ecs.components.physics;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.*;
 import models.PhysicsWorldModel;
 
 import static app.Powers.DEFAULT_SCALING;
@@ -30,8 +27,10 @@ public class PhysicsComponent implements Component {
         Body bodyd = worldModel.world.createBody(bodyDef);
 
         // set the shape (here we use a box 50 meters wide, 1 meter tall )
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1, 1);
+        /*PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1, 1);*/
+        CircleShape shape = new CircleShape();
+        shape.setRadius(1);
 
         // set the properties of the object ( shape, weight, restitution(bouncyness)
         FixtureDef fixtureDef = new FixtureDef();

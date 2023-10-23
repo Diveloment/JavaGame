@@ -4,21 +4,23 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import data.AnimationDecoder;
+import data.GifDecoder;
 import ecs.components.*;
 import ecs.components.collision.CollisionComponent;
 import ecs.components.physics.PhysicsComponent;
 import ecs.systems.*;
 import managers.CollisionComputer;
 import managers.ResourceManager;
+import managers.VFXManager;
 import models.PhysicsWorldModel;
 
 import java.util.concurrent.ExecutorService;
@@ -38,6 +40,9 @@ public class Powers extends ApplicationAdapter {
     PhysicsWorldModel physics;
     Box2DDebugRenderer debugRenderer;
     ResourceManager resourceManager;
+    VFXManager vfxManager;
+
+    ParticleEffect pe;
 
     @Override
     public void create () {
@@ -52,7 +57,8 @@ public class Powers extends ApplicationAdapter {
         textCamera = new OrthographicCamera();
         textCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         collisionComputer = CollisionComputer.getInstance(engine);
-        resourceManager = new ResourceManager();
+        resourceManager = ResourceManager.getInstance();
+        vfxManager = VFXManager.getInstance(batch);
 
         engine.addSystem(new PlayerControlSystem());
         engine.addSystem(new MovementSystem());
@@ -62,6 +68,8 @@ public class Powers extends ApplicationAdapter {
         engine.addSystem(new HealthSystem(engine));
         engine.addSystem(new StatusSystem());
         engine.addSystem(new SpriteRenderSystem(batch));
+
+        //animation = AnimationDecoder.makeAnimation((Texture) resourceManager.getResource("assets/bullet_hit_small.png", Texture.class), 0.045f);
 
         Entity cube = new Entity();
         cube.add(new PositionComponent(100, 0));
@@ -111,6 +119,11 @@ public class Powers extends ApplicationAdapter {
         engine.addEntity(playerEntity);
 
         createWall(new Vector2(200, 100), 100, 1, "Neutrals", true);
+
+        /*pe = new ParticleEffect();
+        pe.load(Gdx.files.internal("assets/p.party"), Gdx.files.internal("assets"));
+        pe.getEmitters().first().setPosition(100, 100);
+        pe.start();*/
     }
 
     @Override
@@ -124,14 +137,17 @@ public class Powers extends ApplicationAdapter {
         debugRenderer.render(physics.world, camera.combined.scl(DEFAULT_SCALING));
 
         // Обновление игры
-        collisionComputer.update();
+        collisionComputer.update(deltaTime);
         camera.update();
 
         shapeRenderer.setProjectionMatrix(camera.combined);
         batch.setProjectionMatrix(camera.combined);
 
+        //pe.update(deltaTime);
         batch.begin();
         engine.update(deltaTime);
+        vfxManager.update(deltaTime);
+        //pe.draw(batch);
         batch.end();
     }
 

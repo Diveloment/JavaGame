@@ -37,7 +37,7 @@ public class CollisionComputer extends GameManager {
     }
 
     @Override
-    public void update() {
+    public void update(float deltaTime) {
         ImmutableArray<Entity> entities = engine.getEntitiesFor(Family.all(CollisionComponent.class, PositionComponent.class, BulletComponent.class).get());
         ImmutableArray<Entity> entitiesB = engine.getEntitiesFor(Family.all(CollisionComponent.class, PositionComponent.class).get());
         collidedEntities.clear();

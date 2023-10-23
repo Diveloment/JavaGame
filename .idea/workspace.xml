@@ -5,24 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9d825356-c867-4278-8825-870f7ead9409" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/data/DamageModifiers.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/data/EntityType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/data/StatusEffect.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ecs/components/DamageComponent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ecs/components/StatusComponent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ecs/systems/HealthSystem.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ecs/systems/StatusSystem.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/managers/ResourceManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/data/AnimationDecoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/data/EntityModifier.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/data/GifDecoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/data/VFXEffectPresets.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/managers/ObjectPool.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/managers/VFXManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/assets/bullet_hit_small.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/assets/p.party" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/assets/particle.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/app/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Application.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/app/Powers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Powers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ecs/components/BulletComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/components/BulletComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ecs/components/HealthComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/components/HealthComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ecs/components/SpriteComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/components/SpriteComponent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ecs/components/TeamComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/components/TeamComponent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/PowersDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/PowersDemo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ecs/components/DamageComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/components/DamageComponent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ecs/components/physics/PhysicsComponent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/components/physics/PhysicsComponent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ecs/systems/BulletSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/systems/BulletSystem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ecs/systems/HealthSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/systems/HealthSystem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ecs/systems/WeaponSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ecs/systems/WeaponSystem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/PhysicsWorldModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/PhysicsWorldModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/CollisionComputer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/CollisionComputer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/GameManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/GameManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/ResourceManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/ResourceManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/assets/powerSupply.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,8 +36,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>

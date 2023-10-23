@@ -9,6 +9,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ResourceManager<T> {
+
+    public static ResourceManager instance;
+
+    public static ResourceManager getInstance() {
+        if (instance == null) {
+            instance = new ResourceManager();
+        }
+        return instance;
+    }
+
+    private ResourceManager() {
+    }
+
     private Map<String, T> resourceCache = new HashMap<>();
 
     public T getResource(String filePath, Class<T> resourceType) {

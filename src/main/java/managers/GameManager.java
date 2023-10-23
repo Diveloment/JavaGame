@@ -6,5 +6,5 @@ public abstract class GameManager {
 
     Engine engine;
 
-    abstract void update();
+    abstract void update(float deltaTime);
 }

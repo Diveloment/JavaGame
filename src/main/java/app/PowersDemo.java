@@ -48,7 +48,7 @@ public class PowersDemo extends ApplicationAdapter {
         playerSprite = new Sprite(new Texture(Gdx.files.internal("assets/cube.png")));
         playerSprite.setScale(2.0f);
 
-        powerSupplyAtlas = new Texture("assets/powerSupply.png");
+        powerSupplyAtlas = new Texture("assets/particle.png");
         TextureRegion[] animationFrames = new TextureRegion[5];
         for (int i = 0; i < 5; i++) {
             animationFrames[i] = new TextureRegion(powerSupplyAtlas, i * 32, 0, 32, 32);

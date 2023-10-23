@@ -10,8 +10,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
+import data.VFXEffectPresets;
 import ecs.components.*;
 import ecs.components.collision.CollisionComponent;
+import managers.VFXManager;
 
 public class WeaponSystem extends IteratingSystem {
     private ComponentMapper<WeaponComponent> weaponMapper;
@@ -20,6 +22,7 @@ public class WeaponSystem extends IteratingSystem {
     private ComponentMapper<AimPointComponent> aimPointMapper;
     private ComponentMapper<SpriteComponent> spriteMapper;
     private Engine engine;
+    private VFXManager vfxManager;
 
     public WeaponSystem(Engine engine) {
         super(Family.all(WeaponComponent.class, PositionComponent.class, RotationComponent.class, SpriteComponent.class, AimPointComponent.class).get());
@@ -29,6 +32,7 @@ public class WeaponSystem extends IteratingSystem {
         aimPointMapper = ComponentMapper.getFor(AimPointComponent.class);
         spriteMapper = ComponentMapper.getFor(SpriteComponent.class);
         this.engine = engine;
+        this.vfxManager = VFXManager.getInstance();
     }
 
     @Override
@@ -47,6 +51,8 @@ public class WeaponSystem extends IteratingSystem {
             weapon.accumulatedTime += deltaTime;
             while (weapon.accumulatedTime >= 0 + weapon.phase)
             {
+                VFXManager.Asset asset = vfxManager.makeAnimationAsset(VFXEffectPresets.BULLET_HIT_SMALL);
+                vfxManager.spawnEffect(asset, position, 0.1f, rotation);
                 fireBullet(position, rotation, weapon);
                 weapon.accumulatedTime -= fireInterval;
             }
@@ -61,7 +67,7 @@ public class WeaponSystem extends IteratingSystem {
         BulletComponent bulletComponent = new BulletComponent();
         PositionComponent positionComponent = new PositionComponent(position.x, position.y);
         DamageComponent damageComponent = new DamageComponent(10.0f);
-        CollisionComponent collisionComponent = new CollisionComponent(8);
+        CollisionComponent collisionComponent = new CollisionComponent(4);
         SpriteComponent spriteComponent = new SpriteComponent(new Texture(Gdx.files.internal("assets/bullet_small_v2.png")));
 
         float angleInRadians = MathUtils.degreesToRadians * rotation.a;
